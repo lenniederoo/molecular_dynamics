@@ -29,17 +29,22 @@ temperature[0]=PQ.calc_Temp(particles)
 
 for i in xrange(amountoftimesteps):
   #starttime= time.time()
+
   particles.update(deltat)
+  if i%20 ==0:
+    PQ.Temp_correction(particles,temp)
+
   energies[i+1]=particles.checkEnergy ()
   #momenta[i+1]=particles.checkMomenta()
   Ekin[i+1]=particles.checkKinEnergy()
   pot[i+1] =particles.checkPotential()
   temperature[i+1]=PQ.calc_Temp(particles)
-  PQ.Temp_correction(particles,temp)
+  
   #timeremaining= (time.time()-starttime)*(amountoftimesteps-i)
   #print "time left: ", timeremaining
 
 t= np.arange(amountoftimesteps+1)
+targetarray=np.ones((amountoftimesteps+1,1),dtype = float)*temp
 figure()
 title('Simulation of %s particles'%(Np))
 subplot(141)
@@ -55,6 +60,7 @@ subplot(144)
 #title('momenta')
 #plot(t,momenta)
 plot(t, temperature)
+plot(t,targetarray)
 title('temperature')
 print ":)"
 show()
