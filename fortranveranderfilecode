@@ -1,0 +1,6 @@
+ f2py -c --f90flags='-fPIC -O3 -funroll-loops -ffast-math -march=native' -m f90force fcalc.f90 --fcompiler=gfortran
+
+
+
+
+ f2py -c --f90flags='-fPIC -O3 -funroll-loops -ffast-math -march=native' -m f90pot Potcalc.f90 --fcompiler=gfortran
