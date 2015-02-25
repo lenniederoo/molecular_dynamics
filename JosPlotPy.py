@@ -18,9 +18,6 @@ class AnimatedScatter(object):
         self.ax = self.fig.add_subplot(111,projection = '3d')
         self.ani = animation.FuncAnimation(self.fig, self.update, interval=1, 
                                            init_func=self.setup_plot,blit=False)
-    def change_angle(self):
-        """ Change angle for each rotation step """
-        self.angle = (self.angle + 1)%360
 
     def setup_plot(self):
         """ Set world coordinates, colors, symbol size ('s') """
@@ -33,8 +30,7 @@ class AnimatedScatter(object):
 
     def stream(self):
         """ 
-           Calls particle update routine, copies it to the relevant section of the 'data' array which 
-           is then yielded
+           Calls particle update routine, yield transposed particle positions
         """
 
         data = np.transpose(self.particles.positions)

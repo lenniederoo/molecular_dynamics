@@ -1,11 +1,7 @@
-#import matplotlib
-#matplotlib.use('TkAgg')
 import numpy as np
-import matplotlib.pyplot as plt
-#import math 
-#import mpl_toolkits.mplot3d.axes3d as p3
 import f90force
 import f90pot
+import molecularPhysicalQuantities as PQ
 
 print "hello world!"
 
@@ -17,7 +13,8 @@ class particleClass:
     self.forces=np.zeros((self.Np,3),dtype=float)
     self.positions, self.L = self.fill_init_pos(density)
     self.momenta = self.fill_init_mom(self.temp)
-    
+    self.changeForces()
+
 
   def show(self):
     print "Amount of particles: ",self.Np," box length: ",self.L
@@ -64,24 +61,10 @@ class particleClass:
     self.changemom(deltat)
     self.changepos(deltat)
     self.changeForces()
+    PQ.Temp_correction(self,self.temp)
     
-  def simulate(self,deltat,d_t):
-    for i in xrange(0,d_t):
-      self.update(deltat)  
-
-  def plotthings(self):
-      fig= plt.figure()
-      ax = fig.gca(projection='3d')
-      #ax=Axes3D(fig)
-      #plotaxis(5)
-      for i in range (0,self.Np):
-          xs,ys,zs = self.positions[i]
-          ax.scatter(xs,ys,zs)
-      plt.show()
-
   def checkMomenta(self):
     momtot=np.sum(self.momenta,axis=0)
-    #print "Total momentum: ",momtot
     return momtot
   
   def checkPotential(self):
@@ -94,24 +77,4 @@ class particleClass:
 
   def checkEnergy(self):
     Etot=self.checkKinEnergy()+self.checkPotential()
-    #print "Total energy: ",Etot
-    return Etot
-
-"""
-  def checkPotential(self,particle1,particle2):
-    deltar= particle1-particle2
-    deltar[0]=deltar[0]-round(deltar[0]/self.L)*self.L
-    deltar[1]=deltar[1]-round(deltar[1]/self.L)*self.L
-    deltar[2]=deltar[2]-round(deltar[2]/self.L)*self.L
-    r2=np.sum(deltar**2)
-    V=4*((1/r2)**6 - (1/r2)**3)
-    return V
-  def checkpotentialSUM(self):
-    potentialSUM=0.0
-    for i in xrange(0,self.Np):
-      for j in xrange(0,self.Np):
-        if j!=i:
-          potentialSUM+=0.5*self.checkPotential(self.positions[i],self.positions[j])
-    return potentialSUM
-"""
-    
+    return Etot    
