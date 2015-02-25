@@ -1,10 +1,11 @@
 from molecularfunctionsOOP import particleClass
 import molecularPhysicalQuantities as PQ
 import numpy as np
-import matplotlib.pyplot as plt
-import time
-from pylab import *
+#import matplotlib.pyplot as plt
+#import time
+from JosPlotPy import AnimatedScatter
 
+print "HOI :D"
 #set global constants
 Np=108
 deltat=.004
@@ -42,28 +43,28 @@ for i in xrange(amountoftimesteps):
   
   #timeremaining= (time.time()-starttime)*(amountoftimesteps-i)
   #print "time left: ", timeremaining
-
-t= np.arange(amountoftimesteps+1)
-targetarray=np.ones((amountoftimesteps+1,1),dtype = float)*temp
-figure()
-title('Simulation of %s particles'%(Np))
-subplot(141)
-title('Kinetic energy')
-plot(t,Ekin)
-subplot(142)
-plot(t, energies)
-title('total energy')
-subplot(143)
-plot(t, pot)
-title('potential energy')
-subplot(144)
-#title('momenta')
-#plot(t,momenta)
-plot(t, temperature)
-plot(t,targetarray)
-title('temperature')
+#
+#t= np.arange(amountoftimesteps+1)
+#targetarray=np.ones((amountoftimesteps+1,1),dtype = float)*temp
+#figure()
+#title('Simulation of %s particles'%(Np))
+#subplot(141)
+#title('Kinetic energy')
+#plot(t,Ekin)
+#subplot(142)
+#plot(t, energies)
+#title('total energy')
+#subplot(143)
+#plot(t, pot)
+#title('potential energy')
+#subplot(144)
+##title('momenta')
+##plot(t,momenta)
+#plot(t, temperature)
+#plot(t,targetarray)
+#title('temperature')
+#print ":)"
+#show()
 print ":)"
-show()
-
-
+Animation=AnimatedScatter(particles,deltat)
 

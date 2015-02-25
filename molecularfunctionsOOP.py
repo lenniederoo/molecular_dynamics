@@ -1,7 +1,9 @@
+#import matplotlib
+#matplotlib.use('TkAgg')
 import numpy as np
 import matplotlib.pyplot as plt
-import math 
-import mpl_toolkits.mplot3d.axes3d as p3
+#import math 
+#import mpl_toolkits.mplot3d.axes3d as p3
 import f90force
 import f90pot
 
@@ -62,6 +64,10 @@ class particleClass:
     self.changemom(deltat)
     self.changepos(deltat)
     self.changeForces()
+    
+  def simulate(self,deltat,d_t):
+    for i in xrange(0,d_t):
+      self.update(deltat)  
 
   def plotthings(self):
       fig= plt.figure()
