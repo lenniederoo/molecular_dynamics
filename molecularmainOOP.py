@@ -20,4 +20,3 @@ plots.PlotThings(particles)
 
 print ":)"
 Animation=AnimatedScatter(particles,deltat)
-

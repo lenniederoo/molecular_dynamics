@@ -58,10 +58,11 @@ class particleClass:
     self.positions = (self.positions + self.momenta*(deltat/self.mass)) % self.L
 
   def update(self,deltat):
+    PQ.Temp_correction(self,self.temp)
     self.changemom(deltat)
     self.changepos(deltat)
     self.changeForces()
-    PQ.Temp_correction(self,self.temp)
+    
     
   def checkMomenta(self):
     momtot=np.sum(self.momenta,axis=0)
