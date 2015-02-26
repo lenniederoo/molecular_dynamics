@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import f90press
 
       
 def calc_av_Mom_sq(momenta,Np):
@@ -16,16 +17,18 @@ def Temp_correction(particles,target):
   labda=math.sqrt(target/temp)
   particles.momenta=labda*particles.momenta
   
-def calc_Press(particles,deltat):
-  indices1=[((particles.positions[:,0] + particles.momenta[:,0]*(deltat/particles.mass))>particles.L)]
-  indices2=[((particles.positions[:,1] + particles.momenta[:,1]*(deltat/particles.mass))>particles.L)]
-  indices3=[((particles.positions[:,2] + particles.momenta[:,2]*(deltat/particles.mass))>particles.L)]
-  #print indices
-  press1=np.sum(particles.momenta[indices1,0])/(particles.L**2*deltat)
-  press2=np.sum(particles.momenta[indices2,1])/(particles.L**2*deltat)
-  press3=np.sum(particles.momenta[indices3,2])/(particles.L**2*deltat)
-  press=(press1+press2+press3)/3
-  return press
+def calc_Press(particles,Ekin):
+    press=f90press.calc_press(particles.positions,particles.L, [particles.Np])
+    press=particles.dens/(3*particles.Np)*(2*Ekin+press)
+#  indices1=[((particles.positions[:,0] + particles.momenta[:,0]*(deltat/particles.mass))>particles.L)]
+#  indices2=[((particles.positions[:,1] + particles.momenta[:,1]*(deltat/particles.mass))>particles.L)]
+#  indices3=[((particles.positions[:,2] + particles.momenta[:,2]*(deltat/particles.mass))>particles.L)]
+#  #print indices
+#  press1=np.sum(particles.momenta[indices1,0])/(particles.L**2*deltat)
+#  press2=np.sum(particles.momenta[indices2,1])/(particles.L**2*deltat)
+#  press3=np.sum(particles.momenta[indices3,2])/(particles.L**2*deltat)
+#  press=(press1+press2+press3)/3
+    return press
   
   
 class PlotPQs:
@@ -54,7 +57,7 @@ class PlotPQs:
       self.Ekin[i+1]=particles.checkKinEnergy()
       self.pot[i+1] =particles.checkPotential()
       self.temperature[i+1]=calc_Temp(particles)  
-      self.pressure[i+1]=calc_Press(particles,self.deltat)
+      self.pressure[i+1]=calc_Press(particles,self.Ekin[i+1])
     t= np.arange(self.n_t+1)
     targetarray=np.ones((self.n_t+1,1),dtype = float)*self.target
     plt.figure()

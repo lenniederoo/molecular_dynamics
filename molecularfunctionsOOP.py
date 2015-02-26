@@ -7,6 +7,7 @@ print "hello world!"
 
 class particleClass:
   def __init__(self, Np, density, temp,mass):
+    self.dens=density
     self.Np=Np
     self.temp=temp
     self.mass=mass
