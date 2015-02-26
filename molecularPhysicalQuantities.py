@@ -50,6 +50,7 @@ class PlotPQs:
     self.pressure[0]=particles.temp/particles.L**3
   
   def PlotThings(self,particles):
+    press=np.zeros((self.n_t+1,1),dtype = float)
     for i in xrange(0,self.n_t):  
       particles.update(self.deltat)
       self.energies[i+1]=particles.checkEnergy ()
@@ -58,6 +59,9 @@ class PlotPQs:
       self.pot[i+1] =particles.checkPotential()
       self.temperature[i+1]=calc_Temp(particles)  
       self.pressure[i+1]=calc_Press(particles,self.Ekin[i+1])
+      if i>20:
+        press[i]=np.sum(self.pressure[i-20:i])/20
+    press[0:20]=self.pressure[0:20]
     t= np.arange(self.n_t+1)
     targetarray=np.ones((self.n_t+1,1),dtype = float)*self.target
     plt.figure()
@@ -81,6 +85,6 @@ class PlotPQs:
     plt.title('temperature')
     plt.show()
     plt.figure()
-    plt.plot(t,self.pressure)
+    plt.plot(t,press)
     plt.title('pressure')
     plt.show()
