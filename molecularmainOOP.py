@@ -2,6 +2,7 @@ from molecularfunctionsOOP import particleClass
 from molecularPhysicalQuantities import PlotPQs
 import numpy as np
 from JosPlotPy import AnimatedScatter
+import molecularPhysicalQuantities as PQ
 
 print "HOI :D here goes the main program"
 matplotlib.pyplot.close("all") #closing all the figures
@@ -19,4 +20,6 @@ plots=PlotPQs(particles,amountoftimesteps,deltat)
 plots.PlotThings(particles)
 
 print ":)"
+print PQ.calc_Corr_velocity(particles,5,amountoftimesteps,deltat)
+PQ.plotcorr(particles,0,100,20,amountoftimesteps,deltat)
 Animation=AnimatedScatter(particles,deltat)

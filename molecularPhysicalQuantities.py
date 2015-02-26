@@ -29,7 +29,24 @@ def calc_Press(particles,Ekin):
 #  press3=np.sum(particles.momenta[indices3,2])/(particles.L**2*deltat)
 #  press=(press1+press2+press3)/3
     return press
+    
+def calc_Corr_velocity(particles,tau,n_t,deltat):
+  corr=0
+  for j in xrange(0,n_t):
+    for i in xrange(0,particles.Np):
+      corr+=np.dot(particles.momenta[i],particles.momenta[i-tau])*deltat
+    particles.update(deltat)
+  corr=corr/particles.Np
+  return corr
   
+def plotcorr(particles,inittau,endtau,amountoftau,n_t,deltat):
+  tau=np.linspace(inittau,endtau,amountoftau)
+  corr=np.zeros((amountoftau,1),dtype = float)
+  for i in xrange(0,amountoftau):
+    corr[i]=calc_Corr_velocity(particles,tau[i],n_t,deltat)
+  plt.figure()
+  plt.plot(tau,corr)
+  plt.title('Correlation')
   
 class PlotPQs:
   def __init__(self, particles,amountoftimesteps,deltat):
