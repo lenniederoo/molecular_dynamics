@@ -23,5 +23,5 @@ plots=PlotPQs(particles,amountoftimesteps,deltat)
 plots.PlotThings(particles,deltat)
 
 print ":)"
-PQ.plotcorr(particles,inittau,endtau,amountoftau,amountoftimesteps,deltat)
+#PQ.plotcorr(particles,inittau,endtau,amountoftau,amountoftimesteps,deltat)
 Animation=AnimatedScatter(particles,deltat)

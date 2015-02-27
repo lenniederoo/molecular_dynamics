@@ -42,8 +42,15 @@ def plotcorr(particles,inittau,endtau,amountoftau,n_t,deltat):
   
   
 def error_calc(quantity):
-    sigma=np.mean(quantity**2,axis=0)-np.mean(quantity,axis=0)**2
-    error=sigma/np.sqrt(np.size(quantity,1))
+    error=np.ones(np.shape(quantity),dtype=float)
+    sigma=np.zeros(np.shape(quantity),dtype=float)
+    block=np.size(quantity,1)/50
+    for i in xrange(0,10):
+        sigma[i*block:(i+1)*block]=np.mean(quantity[i*block:(i+1)*block]**2,axis=0)-np.mean(quantity[i*block:(i+1)*block],axis=0)**2
+    #sigma=np.mean(quantity**2,axis=0)-np.mean(quantity,axis=0)**2    
+    error=error*sigma/np.sqrt(np.size(quantity,1))
+    print 'error',error
+    print 'sigma',sigma
     return error
   
 class PlotPQs:
@@ -80,7 +87,7 @@ class PlotPQs:
     press[0:pressav]=self.pressure[0:pressav]
     t= np.arange(self.n_t+1)*deltat
     targetarray=np.ones((self.n_t+1,1),dtype = float)*self.target
-    presserror=np.ones((self.n_t+1,1),dtype=float)*error_calc(press)
+    presserror=error_calc(press)
     plt.figure()
     plt.subplot(131)
     plt.title('Kinetic energy')
@@ -102,7 +109,7 @@ class PlotPQs:
     plt.title('temperature')
     plt.show()
     plt.figure()
-    plt.plot(t,press)
-    plt.errorbar(t,np.reshape(press,(press.shape[0], )),yerr=np.reshape(presserror,(press.shape[0], )))
+    plt.plot(t,press,marker='o',linestyle='--')
+    plt.errorbar(t,np.reshape(press,(press.shape[0], )),yerr=np.reshape(error_calc(press),(press.shape[0], )))
     plt.title('pressure')
     plt.show()
