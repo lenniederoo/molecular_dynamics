@@ -11,7 +11,7 @@ class AnimatedScatter(object):
     def __init__(self, particles,deltat):      
         self.deltat=deltat
         self.particles=particles
-        self.angle = 0
+        self.angle = 30
         self.fig = plt.figure(figsize=(16,12))
         self.FLOOR = 0.0
         self.CEILING = self.particles.L
@@ -32,7 +32,6 @@ class AnimatedScatter(object):
         """ 
            Calls particle update routine, yield transposed particle positions
         """
-
         data = np.transpose(self.particles.positions)
         while True:
             self.particles.update(self.deltat)
