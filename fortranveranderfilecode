@@ -8,4 +8,6 @@
 f2py -c --f90flags='-fPIC -O3 -funroll-loops -ffast-math -march=native' -m f90press presscalc.f90 --fcompiler=gfortran
 
 Compile code:
-gfortran -c fcalc.f9
+gfortran -c fcalc.f90
+gfortran -c Potcalc.f90
+gfortran -c presscalc.f90
