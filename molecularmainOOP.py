@@ -14,12 +14,14 @@ mass = 1
 dens = 0.85
 temp = 0.9
 amountoftimesteps=1000
+inittau=0 #tau is the correlation time
+endtau=100
+amountoftau=20
 
 particles = particleClass(Np, dens, temp,mass)
 plots=PlotPQs(particles,amountoftimesteps,deltat)
-plots.PlotThings(particles)
+plots.PlotThings(particles,deltat)
 
 print ":)"
-print PQ.calc_Corr_velocity(particles,5,amountoftimesteps,deltat)
-PQ.plotcorr(particles,0,100,20,amountoftimesteps,deltat)
+PQ.plotcorr(particles,inittau,endtau,amountoftau,amountoftimesteps,deltat)
 Animation=AnimatedScatter(particles,deltat)

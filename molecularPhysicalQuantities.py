@@ -20,14 +20,6 @@ def Temp_correction(particles,target):
 def calc_Press(particles,Ekin):
     press=f90press.calc_press(particles.positions,particles.L, [particles.Np])
     press=particles.dens/(3*particles.Np)*(2*Ekin+press)
-#  indices1=[((particles.positions[:,0] + particles.momenta[:,0]*(deltat/particles.mass))>particles.L)]
-#  indices2=[((particles.positions[:,1] + particles.momenta[:,1]*(deltat/particles.mass))>particles.L)]
-#  indices3=[((particles.positions[:,2] + particles.momenta[:,2]*(deltat/particles.mass))>particles.L)]
-#  #print indices
-#  press1=np.sum(particles.momenta[indices1,0])/(particles.L**2*deltat)
-#  press2=np.sum(particles.momenta[indices2,1])/(particles.L**2*deltat)
-#  press3=np.sum(particles.momenta[indices3,2])/(particles.L**2*deltat)
-#  press=(press1+press2+press3)/3
     return press
     
 def calc_Corr_velocity(particles,tau,n_t,deltat):
@@ -36,7 +28,7 @@ def calc_Corr_velocity(particles,tau,n_t,deltat):
     for i in xrange(0,particles.Np):
       corr+=np.dot(particles.momenta[i],particles.momenta[i-tau])*deltat
     particles.update(deltat)
-  corr=corr/particles.Np
+  corr=corr/(particles.Np*n_t*deltat)
   return corr
   
 def plotcorr(particles,inittau,endtau,amountoftau,n_t,deltat):
@@ -45,8 +37,14 @@ def plotcorr(particles,inittau,endtau,amountoftau,n_t,deltat):
   for i in xrange(0,amountoftau):
     corr[i]=calc_Corr_velocity(particles,tau[i],n_t,deltat)
   plt.figure()
-  plt.plot(tau,corr)
+  plt.plot(tau*deltat,corr,marker='o',linestyle='--')
   plt.title('Correlation')
+  
+  
+def error_calc(quantity):
+    sigma=np.mean(quantity**2,axis=0)-np.mean(quantity,axis=0)**2
+    error=sigma/np.sqrt(np.size(quantity,1))
+    return error
   
 class PlotPQs:
   def __init__(self, particles,amountoftimesteps,deltat):
@@ -66,8 +64,9 @@ class PlotPQs:
     self.pressure=np.zeros((self.n_t+1,1),dtype=float)
     self.pressure[0]=particles.temp/particles.L**3
   
-  def PlotThings(self,particles):
+  def PlotThings(self,particles,deltat):
     press=np.zeros((self.n_t+1,1),dtype = float)
+    pressav=50
     for i in xrange(0,self.n_t):  
       particles.update(self.deltat)
       self.energies[i+1]=particles.checkEnergy ()
@@ -76,11 +75,12 @@ class PlotPQs:
       self.pot[i+1] =particles.checkPotential()
       self.temperature[i+1]=calc_Temp(particles)  
       self.pressure[i+1]=calc_Press(particles,self.Ekin[i+1])
-      if i>20:
-        press[i]=np.sum(self.pressure[i-20:i])/20
-    press[0:20]=self.pressure[0:20]
-    t= np.arange(self.n_t+1)
+      if i>pressav:
+        press[i]=np.sum(self.pressure[i-pressav:i])/pressav
+    press[0:pressav]=self.pressure[0:pressav]
+    t= np.arange(self.n_t+1)*deltat
     targetarray=np.ones((self.n_t+1,1),dtype = float)*self.target
+    presserror=np.ones((self.n_t+1,1),dtype=float)*error_calc(press)
     plt.figure()
     plt.subplot(131)
     plt.title('Kinetic energy')
@@ -103,5 +103,6 @@ class PlotPQs:
     plt.show()
     plt.figure()
     plt.plot(t,press)
+    plt.errorbar(t,np.reshape(press,(press.shape[0], )),yerr=np.reshape(presserror,(press.shape[0], )))
     plt.title('pressure')
     plt.show()
