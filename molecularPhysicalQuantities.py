@@ -16,17 +16,13 @@ def Temp_correction(particles,target):
   temp=calc_Temp(particles)
   labda=math.sqrt(target/temp)
   particles.momenta=labda*particles.momenta
-  temp_new=calc_Temp(particles)
-  #print 'target',target
-  #print temp, 'temp oud'
-  #print temp_new, 'temp nieuw'
   
 def calc_Press(particles,Ekin):
     press=f90press.calc_press(particles.positions,particles.L, [particles.Np])
     press=particles.dens/(3*particles.Np)*(2*Ekin+press)
     return press
     
-def calc_Corr_velocity(particles,tau,n_t,deltat):
+def calc_Corr_staticPair(particles,tau,n_t,deltat):
   corr=0
   for j in xrange(0,n_t):
     for i in xrange(0,particles.Np):
@@ -45,28 +41,17 @@ def plotcorr(particles,inittau,endtau,amountoftau,n_t,deltat):
   plt.title('Correlation')
   
 def calc_SpecificHeat(particles,Ekin):
-  #print error_calc(Ekin,20)
   Cv=((3*particles.Np)/2)/(1-(3*particles.Np*np.var(Ekin))/(2*Ekin**2))
-  #print Cv
   return Cv
   
   
 def error_calc(quantity,number_of_blocks):
     error=np.ones(np.shape(quantity),dtype=float)
     sigma=np.zeros(np.shape(quantity),dtype=float)
-    #number_of_blocks=20
-    block=np.size(quantity,0)/number_of_blocks
-    #print 'block',block
+    block=np.size(quantity,0)/number_of_blocks #blocksize
     for i in xrange(0,number_of_blocks):
-        #sigma[i*block:(i+1)*block]=np.mean(quantity[i*block:(i+1)*block]**2,axis=0)-np.mean(quantity[i*block:(i+1)*block],axis=0)**2
         sigma[i*block:(i+1)*block]=np.var(quantity[i*block:(i+1)*block],axis=0)    
-        #print np.mean(quantity[i*block:(i+1)*block]**2),'mean of squared'
-        #print np.mean(quantity[i*block:(i+1)*block])**2, 'squared of mean'
-    #sigma=np.mean(quantity**2,axis=0)-np.mean(quantity,axis=0)**2    
     error=error*sigma/np.sqrt(block)
-    #print 'error',error
-    #print 'sigma',sigma
-    #print quantity, 'quantity'
     return error
   
 class PlotPQs:
@@ -104,35 +89,45 @@ class PlotPQs:
     plt.figure()
     plt.subplot(131)
     plt.title('Kinetic energy')
-    plt.errorbar(t,np.reshape(self.Ekin,(self.Ekin.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.Ekin,20),(self.Ekin.shape[0], )))
-    plt.plot(t,self.Ekin)
+    plt.errorbar(t,np.reshape(self.Ekin,(self.Ekin.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.Ekin,20),(self.Ekin.shape[0], )),marker='',label='Statistical error')
+    plt.plot(t,self.Ekin,label='Calculated data')
+    plt.legend()
     plt.subplot(132)
-    plt.errorbar(t,np.reshape(self.energies,(self.energies.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.energies,20),(self.energies.shape[0], )))
-    plt.plot(t, self.energies)
+    plt.errorbar(t,np.reshape(self.energies,(self.energies.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.energies,20),(self.energies.shape[0], )),marker='',label='Statistical error')
+    plt.plot(t, self.energies,label='Calculated data')
     plt.title('total energy')
+    plt.legend()
     plt.subplot(133)
-    plt.errorbar(t,np.reshape(self.pot,(self.pot.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pot,20),(self.pot.shape[0], )))
-    plt.plot(t, self.pot)
+    plt.errorbar(t,np.reshape(self.pot,(self.pot.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pot,20),(self.pot.shape[0], )),marker='',label='Statistical error')
+    plt.plot(t, self.pot,label='Calculated data')
     plt.title('potential energy')
+    plt.legend()
     plt.show()
     plt.figure()
     plt.subplot(121)
-    plt.title('momenta')
+    plt.title('Total momenta')
     plt.plot(t,self.mom)
-    #plt.errorbar(t,self.mom,marker='.',linestyle='',yerr=error_calc(self.mom,20))
-    plt.subplot(122)
-    #plt.plot(t, self.temperature)
-    plt.errorbar(t,np.reshape(self.temperature,(self.temperature.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.temperature,20),(self.temperature.shape[0], )))
-    plt.plot(t,targetarray)
+    plt.legend(('x-direction','y-direction','z-direction'))
+    plt.subplot(122)    
+    plt.errorbar(t,np.reshape(self.temperature,(self.temperature.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.temperature,20),(self.temperature.shape[0], )),marker='',label='Statistical error')
+    plt.plot(t, self.temperature,label='calculated data')
+    plt.plot(t,targetarray,label='Target temperature')
     plt.title('temperature')
+    plt.legend()
     plt.show()
     plt.figure()
-    plt.errorbar(t,np.reshape(self.pressure,(self.pressure.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pressure,20),(self.pressure.shape[0], )))
-    plt.plot(t,self.pressure)
+    plt.errorbar(t,np.reshape(self.pressure,(self.pressure.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pressure,20),(self.pressure.shape[0], )),marker='',label='Statistical error')
+    plt.plot(t,self.pressure,label='Calculated data')
     plt.title('pressure')
+    plt.xlabel('Time steps')
+    plt.ylabel('pressure')
+    plt.legend()
     plt.show()
     plt.figure()
-    plt.errorbar(t[0:self.n_t],np.reshape(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )),marker='',linestyle='-',yerr=np.reshape(error_calc(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),20),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )))
-    plt.plot(t[0:self.n_t],calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),linestyle='-')
+    plt.errorbar(t[0:self.n_t],np.reshape(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )),marker='',linestyle='-',yerr=np.reshape(error_calc(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),20),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )),label='Statistical error')
+    plt.plot(t[0:self.n_t],calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),linestyle='-',label='Calculated data')
     plt.title('Specific Heat by constant Volume')
+    plt.xlabel('Time steps')
+    plt.ylabel('Specific Heat')
+    plt.legend()
     plt.show()
