@@ -16,7 +16,6 @@ class particleClass:
     self.momenta = self.fill_init_mom(self.temp)
     self.changeForces()
 
-
   def show(self):
     print "Amount of particles: ",self.Np," box length: ",self.L
     print "Positions: ", self.positions
@@ -68,6 +67,10 @@ class particleClass:
   def checkMomenta(self):
     momtot=np.sum(self.momenta,axis=0)
     return momtot
+    
+  def checkforces(self):
+    forcetot=np.mean(self.forces,axis=0)
+    return forcetot  
   
   def checkPotential(self):
     totpot=f90pot.calc_pot(self.positions,self.L, [self.Np])

@@ -20,8 +20,9 @@ amountoftau=20
 
 particles = particleClass(Np, dens, temp,mass)
 plots=PlotPQs(particles,amountoftimesteps,deltat)
-plots.PlotThings(particles,deltat)
+
 
 print ":)"
+quantity=plots.PlotThings(particles,deltat)
 #PQ.plotcorr(particles,inittau,endtau,amountoftau,amountoftimesteps,deltat)
-Animation=AnimatedScatter(particles,deltat)
+#Animation=AnimatedScatter(particles,deltat)
