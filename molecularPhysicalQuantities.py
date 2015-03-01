@@ -90,8 +90,6 @@ class PlotPQs:
     self.krachten[0]=particles.checkforces()
   
   def PlotThings(self,particles,deltat):
-    press=np.zeros((self.n_t+1,1),dtype = float)
-    pressav=50
     for i in xrange(0,self.n_t):  
       particles.update(self.deltat)
       self.energies[i+1]=particles.checkEnergy ()
@@ -101,20 +99,19 @@ class PlotPQs:
       self.temperature[i+1]=calc_Temp(particles)  
       self.pressure[i+1]=calc_Press(particles,self.Ekin[i+1])
       self.krachten[i+1]=particles.checkforces()
-      if i>pressav:
-        press[i]=np.sum(self.pressure[i-pressav:i])/pressav
-    press[0:pressav]=self.pressure[0:pressav]
     t= np.arange(self.n_t+1)
     targetarray=np.ones((self.n_t+1,1),dtype = float)*self.target
-    #presserror=error_calc(press)
     plt.figure()
     plt.subplot(131)
     plt.title('Kinetic energy')
+    plt.errorbar(t,np.reshape(self.Ekin,(self.Ekin.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.Ekin,20),(self.Ekin.shape[0], )))
     plt.plot(t,self.Ekin)
     plt.subplot(132)
+    plt.errorbar(t,np.reshape(self.energies,(self.energies.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.energies,20),(self.energies.shape[0], )))
     plt.plot(t, self.energies)
     plt.title('total energy')
     plt.subplot(133)
+    plt.errorbar(t,np.reshape(self.pot,(self.pot.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pot,20),(self.pot.shape[0], )))
     plt.plot(t, self.pot)
     plt.title('potential energy')
     plt.show()
@@ -122,25 +119,20 @@ class PlotPQs:
     plt.subplot(121)
     plt.title('momenta')
     plt.plot(t,self.mom)
+    #plt.errorbar(t,self.mom,marker='.',linestyle='',yerr=error_calc(self.mom,20))
     plt.subplot(122)
     #plt.plot(t, self.temperature)
-    plt.errorbar(t,np.reshape(self.temperature,(self.temperature.shape[0], )),marker='o',linestyle='',yerr=np.reshape(error_calc(self.temperature,20),(self.temperature.shape[0], )))
+    plt.errorbar(t,np.reshape(self.temperature,(self.temperature.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.temperature,20),(self.temperature.shape[0], )))
     plt.plot(t,targetarray)
     plt.title('temperature')
     plt.show()
     plt.figure()
-    #plt.plot(t,press,marker='o',linestyle='--')
-    #print error_calc(press),'errorarray'
-    #print np.reshape(error_calc(press),(press.shape[0], )),' npreshape' 
-    plt.errorbar(t,np.reshape(self.pressure,(self.pressure.shape[0], )),marker='o',linestyle='',yerr=np.reshape(error_calc(self.pressure,20),(press.shape[0], )))
+    plt.errorbar(t,np.reshape(self.pressure,(self.pressure.shape[0], )),linestyle='-',yerr=np.reshape(error_calc(self.pressure,20),(self.pressure.shape[0], )))
+    plt.plot(t,self.pressure)
     plt.title('pressure')
     plt.show()
     plt.figure()
-    plt.plot(t[0:self.n_t],calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),marker='o',linestyle='--')
+    plt.errorbar(t[0:self.n_t],np.reshape(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )),marker='',linestyle='-',yerr=np.reshape(error_calc(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),20),(calc_SpecificHeat(particles,self.Ekin[0:self.n_t]).shape[0], )))
+    plt.plot(t[0:self.n_t],calc_SpecificHeat(particles,self.Ekin[0:self.n_t]),linestyle='-')
     plt.title('Specific Heat by constant Volume')
     plt.show()
-    plt.figure()
-    plt.plot(t,self.krachten)
-    plt.title('forces')
-    plt.show()
-    return press

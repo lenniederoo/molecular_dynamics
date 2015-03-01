@@ -63,7 +63,6 @@ class particleClass:
     self.changepos(deltat)
     self.changeForces()
     
-    
   def checkMomenta(self):
     momtot=np.sum(self.momenta,axis=0)
     return momtot
